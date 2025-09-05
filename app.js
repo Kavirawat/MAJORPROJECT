@@ -5,6 +5,8 @@ const Listing = require("./models/listing.js");
 const path = require("path");
 const methodoverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const wrapAsync = require("./utils/wrapAsync.js");
+const ExpressError = require("./utils/ExpressError.js");
 
 const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -54,11 +56,14 @@ app.get("/listings/:id/edit", async (req, res) => {
 });
 
 //Create Route
-app.post("/listings", async (req, res) => {
-  const newListing = new Listing(req.body.listing);
-  await newListing.save();
-  res.redirect("/listings");
-});
+app.post(
+  "/listings",
+  wrapAsync(async (req, res, next) => {
+    const newListing = new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listings");
+  })
+);
 
 //New Route
 app.get("/listings/new", (req, res) => {
@@ -76,6 +81,16 @@ app.get("/listings/:id", async (req, res) => {
 app.get("/listings", async (req, res) => {
   const allListings = await Listing.find({});
   res.render("./listings/index.ejs", { allListings });
+});
+
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "page not found"));
+});
+
+//Error Hnadlling Middleware
+app.use((err, req, res, next) => {
+  let { statusCode, message } = err;
+  res.statusCode(statusCode).send(message);
 });
 
 app.listen(8080, () => {
