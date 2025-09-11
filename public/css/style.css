@@ -56,7 +56,7 @@ body {
   flex-wrap: wrap;
 }
 
-.card {
+.listings-card {
   border: none !important;
   margin-bottom: 2rem;
 }
