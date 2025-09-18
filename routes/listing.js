@@ -2,22 +2,14 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 const Listing = require("../models/listing.js");
 const wrapAsync = require("../utils/wrapAsync.js");
-const ExpressError = require("../utils/ExpressError.js");
-const { listingSchema } = require("../schema.js");
-
-const validateListing = (req, res, next) => {
-  let { error } = listingSchema.validate(req.body);
-  if (error) {
-    let errMsg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError(400, errMsg);
-  } else {
-    next();
-  }
-};
+const { isloggedIn, isOwner, validateListing } = require("../middleware.js");
+const { authorize } = require("passport");
 
 //Delete Route
 router.delete(
   "/:id",
+  isloggedIn,
+  isOwner,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     let deleteListing = await Listing.findByIdAndDelete(id);
@@ -30,6 +22,8 @@ router.delete(
 //Update Route
 router.put(
   "/:id",
+  isloggedIn,
+  isOwner,
   validateListing,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
@@ -42,6 +36,8 @@ router.put(
 //Edit Route
 router.get(
   "/:id/edit",
+  isloggedIn,
+  isOwner,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
@@ -56,9 +52,11 @@ router.get(
 //Create Route
 router.post(
   "/",
+  isloggedIn,
   validateListing,
   wrapAsync(async (req, res, next) => {
     const newListing = new Listing(req.body.listing);
+    newListing.owner = req.user._id;
     await newListing.save();
     req.flash("success", "New Listing Created!");
     res.redirect("/listings");
@@ -66,7 +64,7 @@ router.post(
 );
 
 //New Route
-router.get("/new", (req, res) => {
+router.get("/new", isloggedIn, (req, res) => {
   res.render("listings/new.ejs");
 });
 
@@ -75,7 +73,14 @@ router.get(
   "/:id",
   wrapAsync(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id)
+      .populate({
+        path: "reviews",
+        populate: {
+          path: "author",
+        },
+      })
+      .populate("owner");
     if (!listing) {
       req.flash("error", "Listing you requested ror does not exist!");
       return res.redirect("/listings");
