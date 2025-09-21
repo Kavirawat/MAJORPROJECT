@@ -8,6 +8,7 @@
       action="/listings/<%= listing.id %>?_method=PUT"
       novalidate
       class="needs-validation"
+      enctype="multipart/form-data"
     >
       <div class="mb-4">
         <label for="title" class="form-label">Title</label>
@@ -22,6 +23,7 @@
         <div class="valid-feedback">Title look's good!</div>
         <div class="invalid-feedback">Please enter valid title</div>
       </div>
+
       <div class="mb-4">
         <label for="description" class="form-label">Description</label>
         <textarea
@@ -38,19 +40,22 @@
         <div class="valid-feedback">Description look's good!</div>
         <div class="invalid-feedback">Please enter a short description</div>
       </div>
+
       <div class="mb-4">
-        <label for="image" class="form-label">Image Link</label>
+        <p class="mb-2">Original Listing Image</p>
+        <img width="250rem" height="300rem" src="<%= originalImageUrl %>"/>
+      </div>
+
+      <div class="mb-4">
+        <label for="image" class="form-label">Upload New Image </label>
         <input
           name="listing[image]"
-          value="<%= listing.image %>"
-          type="text"
+          type="file"
           class="form-control"
           id="image"
-          required
         />
-        <div class="valid-feedback">Image look's good!</div>
-        <div class="invalid-feedback">Please enter a valid link for image</div>
       </div>
+
       <div class="row">
         <div class="mb-4 col-md-4">
           <label for="price" class="form-label">Price</label>
@@ -65,6 +70,7 @@
           <div class="valid-feedback">Price look's good!</div>
           <div class="invalid-feedback">Price should be valid</div>
         </div>
+
         <div class="mb-4 col-md-8">
           <label for="country" class="form-label">Country</label>
           <input
@@ -93,6 +99,7 @@
         <div class="valid-feedback">Location look's good!</div>
         <div class="invalid-feedback">Location should be valid</div>
       </div>
+
       <button class="btn btn-dark edit-btn mt-3">Update</button>
       <br /><br />
     </form>

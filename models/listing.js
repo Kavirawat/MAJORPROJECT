@@ -10,12 +10,8 @@ const listingSchema = new Schema({
   },
   description: String,
   image: {
-    type: String,
-    default: "https://tiimg.tistatic.com/fp/1/005/026/nature-wallpaper-112.jpg",
-    set: (v) =>
-      v === ""
-        ? "https://tiimg.tistatic.com/fp/1/005/026/nature-wallpaper-112.jpg"
-        : v,
+    url: String,
+    filename: String,
   },
   price: Number,
   location: String,
