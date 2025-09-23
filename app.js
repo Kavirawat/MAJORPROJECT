@@ -51,9 +51,9 @@ const sessionOpt = {
   httpOnly: true,
 };
 
-app.get("/", (req, res) => {
-  res.send("Hi i am kavir rawat");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hi i am kavir rawat");
+// });
 
 app.use(session(sessionOpt));
 app.use(flash());
